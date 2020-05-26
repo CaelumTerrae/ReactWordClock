@@ -24,8 +24,25 @@
   color: white;
 }
 
-.App-link {
+.dimmed {
+  color: gray;
+}
+
+.highlighted {
   color: #61dafb;
+}
+
+.dimmed > pre, .highlighted > pre {
+  margin: 0px;
+  transition: color 1s;
+  -webkit-transition: color 1s;
+}
+
+.line-container > div {
+  display: inline-block;
+  margin: 0px;
+  transition: color 1s;
+  -webkit-transition: color 1s;
 }
 
 @keyframes App-logo-spin {
