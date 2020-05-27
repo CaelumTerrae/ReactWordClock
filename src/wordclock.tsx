@@ -24,9 +24,10 @@ function withinMinutes(currentTime : number, minutes : number, threshold : numbe
 // Additional components:
 
 // Highlights text and preserves whitespace
-function Highlight({children} : HelperProps){
+const Highlight : React.FC = ({children}) =>{
     return <div className="highlighted"><pre>{children}</pre></div>
 }
+
 
 // Dims text and preserves whitespace
 function Dim({children} : HelperProps){
@@ -60,8 +61,8 @@ function Line1() : React.ReactElement{
 }
 
 // Determines if minutes is in first quarter or last quarter of hour (quarter range) and renders appropriately
-function Line2({minutes} : MinuteLineProps) : React.ReactElement{
-    const withinQuarter = withinMinutes(minutes, 15, timeThreshold);
+const Line2 : React.FC<MinuteLineProps> = (props) =>{
+    const withinQuarter = withinMinutes(props.minutes, 15, timeThreshold);
     return (<LineContainer>
         <ClockSwitch switched={withinQuarter}>A </ClockSwitch>
         <Dim>V </Dim>
@@ -69,6 +70,7 @@ function Line2({minutes} : MinuteLineProps) : React.ReactElement{
         <Dim>M Y </Dim>
     </LineContainer>)
 }
+
 
 // Determines if minutes is in 25, 5, or 20 range of hour and renders appropriately
 function Line3({minutes} : MinuteLineProps) : React.ReactElement{
@@ -175,19 +177,34 @@ function Line10({minutes,hours}: LineProps){
 }
 
 // Component that gets the time, and houses all line components
-function WordClock({children}: any){
-    const currentTime : Date = new Date();
-    const LineDateTime : LineProps = {
-        minutes: currentTime.getMinutes() + currentTime.getSeconds()/60,
-        hours: currentTime.getHours() % 12
-    } 
+
+const WordClock : React.FC<{date : Date}> = (props) =>{
+    const curr = props.date;
+    const [LineDateTime, setLineDateTime] = React.useState<LineProps>({minutes: curr.getMinutes(), hours: curr.getHours()});
+    React.useEffect(() => {
+            const currentTime = curr;
+            const temp : LineProps = {
+                minutes: currentTime.getMinutes() + currentTime.getSeconds()/60,
+                hours: currentTime.getHours() % 12
+            } 
+    
+            if (temp.minutes >= 30 + timeThreshold){
+                temp.hours = temp.hours + 1;
+            }
+
+            //check goes here to see if linedate time crosses 2.5 min threshold?
+            console.log(temp.minutes, LineDateTime);
+             if (!(LineDateTime) || (LineDateTime?.minutes !== temp.minutes) ||
+                 (LineDateTime?.hours !== temp.hours)){
+                setLineDateTime(temp);
+             }
+    }, [curr])
+
 
     // This makes the logic for rendering phrases including "to" much easier
-    if (LineDateTime.minutes >= 30 + timeThreshold){
-        LineDateTime.hours = LineDateTime.hours + 1;
-    }
 
-    return (<>
+    
+    return LineDateTime ? (<>
             <Line1/>
             <Line2 minutes={LineDateTime.minutes}></Line2>
             <Line3 minutes={LineDateTime.minutes}></Line3>
@@ -198,6 +215,7 @@ function WordClock({children}: any){
             <Line8 hours={LineDateTime.hours}></Line8>
             <Line9 hours={LineDateTime.hours}></Line9>
             <Line10 minutes={LineDateTime.minutes} hours={LineDateTime.hours}></Line10>
-            </>);
+            </>) : null;
 }
+
 export default WordClock;

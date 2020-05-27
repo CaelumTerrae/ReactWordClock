@@ -15,7 +15,7 @@ function tick(){
 }
 
 tick();
-setInterval(tick, 1000);
+
 
 
 

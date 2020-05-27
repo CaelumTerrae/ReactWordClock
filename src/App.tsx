@@ -3,10 +3,12 @@ import WordClock from './wordclock';
 import './App.css';
 
 function App() {
+  const [curr, setCurr] = React.useState(new Date());
+  setInterval(() => setCurr(new Date()),1000);
   return (
     <div className="App">
       <header className="App-header">
-        <WordClock> </WordClock>
+        <WordClock date={curr}/>
       </header>
     </div>
   );
